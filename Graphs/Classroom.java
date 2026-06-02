@@ -82,7 +82,7 @@ public class Classroom {
                 dfsUtil(graph, e.dest, vis);
             }
         }
-    }
+    } 
 
     // bfs using Arraylist of Arraylist
     static ArrayList<Integer> bfs2(ArrayList<ArrayList<Integer>> adj) {
@@ -323,6 +323,177 @@ public class Classroom {
         return ans;
     }
 
+    // dsu
+    class DSU{
+        int[] parent;
+        int [] weight;
+
+        DSU(int n){
+            for(int idx = 0;idx<n;idx++){
+                parent[idx] = -1;
+            }
+
+            this.weight = new int[n];
+            for(int idx = 0;idx<n;idx++){
+                weight[idx] = 1;
+            }
+        }
+
+        // path compression
+        int find(int idx){
+            if(parent[idx]==idx)return idx;
+            return parent[idx] = find(parent[idx]);
+        }
+
+        // weighted union
+        void union(int a,int b){
+            int pa = find(a);
+            int pb = find(b);
+
+            if(pa==pb) return;
+
+            if(weight[pa]>weight[pb]){
+                parent[pb] = pa;
+                weight[pa] += weight[pb];
+            }else{
+                parent[pa] = pb;
+                weight[pb] += weight[pa];
+            }
+        }
+
+    }
+
+
+    // static class Pair implements Comparable<Pair>{
+    //     int n;
+    //     int path;
+
+    //     public Pair(int n,int path){
+    //         this.n = n;
+    //         this.path = path;
+    //     }
+
+    //     @Override
+    //     public int compareTo(Pair p2){
+    //         return this.path - p2.path; // forming min heap(ascending order) path b ase sorting
+    //     }
+
+    // }
+
+    // public static void dijkstra(ArrayList<Edge>[]graph,int src){
+    //     int dist[] = new int[graph.length];
+    //     for(int i = 0;i<dist.length;i++){
+    //         if(i != src){
+    //             dist[i] = Integer.MAX_VALUE;
+    //         }
+    //     }
+
+    //     boolean vis[] = new boolean[graph.length];
+    //     PriorityQueue<Pair> pq = new PriorityQueue<>();
+    //     pq.add(new Pair(src,0));
+
+    //     while(!pq.isEmpty()){
+    //         Pair curr = pq.remove();
+    //         if(!vis[curr.n]){
+    //             vis[curr.n] = true;
+    //             for(int i =0;i<graph[curr.n].size();i++){
+    //                 Edge e = graph[curr.n].get(i);
+    //                 int u = e.src;
+    //                 int v = e.dest;
+    //                 int wt = e.wt;
+
+    //                 if(dist[u]+wt <dist[v]){
+    //                     dist[v] = dist[u]+wt;
+    //                     pq.add(new Pair(v, dist[v]));
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     for(int i = 0;i<dist.length;i++){
+    //         System.out.println(dist[i]+ " ");
+    //     }
+    //     System.out.println();
+    // }
+
+
+    // // bellman ford algorithm(for negative edges)
+    // public static void bellmanFord(ArrayList<Edge> []graph,int src){
+    //     int dist[] = new int[graph.length];
+
+    //     for(int i =0;i<dist.length;i++){
+    //         if(i!=src){
+    //             dist[i] = Integer.MAX_VALUE;
+    //         }
+    //     }
+
+    //     int V = graph.length;
+
+    //     // algo
+    //     for(int i =0;i<V-1;i++){
+    //         //edges - O(E)
+    //         for(int j = 0;j<graph.length;j++){
+    //             for(int k = 0; k<graph[j].size();k++){
+    //                 Edge e = graph[j].get(k);
+    //                 // u,v,wt
+    //                 int u =e.src;
+    //                 int v = e.dest;
+    //                 int wt = e.wt;
+    //                 // relaxation
+    //                 if(dist[u]!= Integer.MAX_VALUE && dist[u]+wt<dist[v]){
+    //                     dist[v] = dist[u]+wt;
+    //                 }
+
+    //             }
+    //         }
+
+    //     }
+
+    //     for(int i =0;i<dist.length;i++){
+    //         System.out.println(dist[i]+" ");
+    //     }
+    //     System.out.println();
+    // }
+
+    //Prim's algorithm for mst
+
+    static class Pair implements Comparable<Pair>{
+        int v;
+        int cost;
+
+        public Pair(int v, int c){
+            this.v = v;
+            this.cost = c;
+        }
+
+        @Override
+        public int compareTo(Pair p2){
+            return this.cost-p2.cost;    // ascending
+        }
+    }
+    public static void prims(ArrayList<Edge>[]graph){
+        boolean vis[] = new boolean[graph.length];
+        PriorityQueue<Pair> pq = new PriorityQueue<>();
+        pq.add(new Pair(0, 0));
+        int finalCost = 0; //mst total minimum weight
+
+        while(!pq.isEmpty()){
+            Pair curr = pq.remove();
+            if(vis[curr.v]==false){
+                vis[curr.v]= true;
+                finalCost += curr.cost;
+
+                for(int i =0;i<graph[curr.v].size();i++){
+                    Edge e = graph[curr.v].get(i);
+                    pq.add(new Pair(e.dest, e.wt));
+                }
+            }
+        }
+        System.out.println(finalCost);
+
+    }
+
+     
 
     public static void main(String[] args) {
         int V = 5;
@@ -336,19 +507,25 @@ public class Classroom {
 
         // System.out.println(hasPath(graph, 1, 4, new boolean [V]));
 
-        // // 2's neighbour
-        // for(int i=0;i<graph[2].size();i++){
-        // Edge e = graph[2].get(i); //src,dest,wt
-        // System.out.println(e.dest);
-        // }
-        // System.out.println();
-        // System.out.println(isBipartite(graph));
+        // 2's neighbour
+    //     for(int i=0;i<graph[2].size();i++){
+    //     Edge e = graph[2].get(i); //src,dest,wt
+    //     System.out.println(e.dest);
+    //     }
+    //     System.out.println();
+    //     System.out.println(isBipartite(graph));
 
-        // System.out.println(detectCycle(graph));;
+    //     System.out.println(detectCycle(graph));;
 
-        System.out.println(isCycle(graph));
-       // topSort(graph);
-        topSortb(graph);
+    //     System.out.println(isCycle(graph));
+    //    // topSort(graph);
+    //     topSortb(graph);
+
+
+    // int src = 0;
+    // dijkstra(graph, src);
+    //bellmanFord(graph, 0);
+    prims(graph);
 
     }
 }
