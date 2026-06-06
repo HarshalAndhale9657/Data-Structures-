@@ -13,6 +13,7 @@ public class coinChange{
             dp[0][j] = 0;
         }
 
+        
         for(int i = 1 ; i<n+1; i++){
             for(int j = 1; j< sum+1; j++){
                 if(coins[i-1] <= j){
